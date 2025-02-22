@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Real-Time Chat</title>
+  <script src="/socket.io/socket.io.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; }
+    #messages { list-style-type: none; padding: 0; }
+    #messages li { padding: 8px; margin-bottom: 4px; background-color: #f1f1f1; }
+    #messageInput { width: 80%; }
+    #nameInput { margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Real-Time Chat</h1>
+  <div>
+    <input id="nameInput" type="text" placeholder="Enter your name" value="Sheldon" required>
+  </div>
+
+  <div>
+    <input id="messageInput" type="text" placeholder="Type a message" required>
+    <button id="sendBtn">Send</button>
+  </div>
+
+  <ul id="messages"></ul>
+
+  <script>
+    const socket = io();
+    let userName = 'Sheldon'; 
+
+    const nameInput = document.getElementById('nameInput');
+    const messageInput = document.getElementById('messageInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const messages = document.getElementById('messages');
+
+    nameInput.addEventListener('input', () => {
+      userName = nameInput.value;
+    });
+
+    sendBtn.addEventListener('click', () => {
+      if (userName && messageInput.value.trim() !== '') {
+        socket.emit('chat message', { name: userName, message: messageInput.value });
+        messageInput.value = ''; 
+      } else {
+        alert('Please enter your name and message!');
+      }
+    });
+    socket.on('chat message', (data) => {
+      const li = document.createElement('li');
+      li.textContent = `${data.name}: ${data.message}`;
+      messages.appendChild(li);
+    });
+  </script>
+</body>
+</html>
